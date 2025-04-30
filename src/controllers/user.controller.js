@@ -58,7 +58,31 @@ export async function getUsers(req, res) {
         data: users
     })
 }
+export async function deleteUser(req, res) {
+    try {
+        const userRepository = appDataSource.getRepository(UserSchema);
+        const id = req.params.id;
 
-export async function deleteUser(req,res) {
-    
+        const userFound = await userRepository.findOne({ where: { id } });
+
+        if (!userFound) {
+            return res.status(404).json({
+                message: "Usuario no encontrado",
+                data: null
+            });
+        }
+
+        await userRepository.remove(userFound);
+
+        return res.status(200).json({
+            message: "Usuario eliminado correctamente",
+            data: userFound
+        });
+    } catch (error) {
+        console.error("Error al eliminar el usuario:", error);
+        return res.status(500).json({
+            message: "Error del servidor",
+            error: error.message
+        });
+    }
 }
